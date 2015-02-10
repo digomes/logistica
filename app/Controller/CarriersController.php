@@ -101,4 +101,27 @@ class CarriersController extends AppController {
 		}
 		return $this->redirect(array('action' => 'index'));
 	}
+
+	public function reverses(){
+                $this->Carrier->recursive = 1;   
+                $reverses = $this->Carrier->Reverse->find('all', array(
+                    'conditions' => array(
+                        //'AND' => array(
+                       // 'AND' => array(
+                               
+                        //    ),
+                      //  'OR' => array(
+                            'Reverse.status_id' => '10', 
+                            'Status.visibility_groups LIKE' => '%"' . $this->roleId . '"%',
+                            'Reverse.carrier_id =' => $this->carrieruserId
+                          //  )
+                       // )
+                       ),
+                    'limit' => '1000'
+                )
+                );
+                   // $reverses = $this->paginate('Reverse');
+                    $this->set(compact('reverses'));
+                     //Debugger::dump($reverses);
+	}
 }

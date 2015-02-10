@@ -167,19 +167,4 @@ class ReversesProductsController extends AppController {
 		//$this->Export->exportCsv($reversesproducts, 'reverses'.date('Y-m-d H:i:s').'.csv');
 	}
 
-	public function exportPlan2(){
-		$this->ReversesProduct->recursive = 1;
-		$reversesproducts = $this->ReversesProduct->find('all', array());
-		//$reverses = $this->ReversesProduct->Reverse->User->find('all');
-		$_serialize = array('reversesproducts');
-		$_delimiter = ';';
-		$_header = array('Numero da Coleta', 'Numero NF Posto', 'Serie NF', 'Volume', 'Valor NF', 'Nome do Usuario', 'Nome do Posto', 'Status', 'Centro de Custo', 'Numero de SO', 'Data Solicitacao', 'Observacao', 'NF de Origem', 'Modelo', 'Descricao do Produto', 'Embalagem', 'Etiqueta');
-		$_extract = array('Reverse.id', 'Reverse.invoice', 'Reverse.serie', 'Reverse.quantity', 'Reverse.amount', 'User.name', 'User.username', 'Reverse.status_id', 'Cost.name', 'Reverse.so', 'Reverse.created', 'Reverse.observation', 'Reverse.reverse', 'Product.material', 'Product.description', 'ReversesProduct.embalagem', 'ReversesProduct.etiqueta');
-
-		$this->viewClass = 'CsvView.Csv';
-		$this->set(compact('reversesproducts', '_serialize', '_header', '_extract', '_delimiter'));
-		//Debugger::dump($reversesproducts);
-		//$this->Export->exportCsv($reverses, 'reverses'.date('Y-m-d H:i:s').'.csv');
-	}
-
 }

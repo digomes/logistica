@@ -53,7 +53,7 @@ class Reverse extends AppModel {
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
-		)
+		),
 	);
 
         

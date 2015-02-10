@@ -110,8 +110,9 @@ if (!$this->User->exists($id)) {
 			}
 		}
 		$groups = $this->User->Group->find('list');
+        $carriers = $this->User->Workshop->Carrier->find('list');
 		$workshops = $this->User->Workshop->find('list');
-		$this->set(compact('groups', 'workshops'));
+		$this->set(compact('groups', 'workshops', 'carriers'));
 	}
 
 /**
@@ -142,7 +143,8 @@ if (!$this->User->exists($id)) {
 		}
 		$groups = $this->User->Group->find('list');
 		$workshops = $this->User->Workshop->find('list');
-		$this->set(compact('groups', 'workshops'));
+        $carriers = $this->User->Workshop->Carrier->find('list');
+		$this->set(compact('groups', 'workshops', 'carriers'));
 	}
 
 /**
@@ -243,6 +245,9 @@ if (!$this->User->exists($id)) {
         Debugger::dump($reversesproducts);
         //$this->Export->exportCsv($reverses, 'reverses'.date('Y-m-d H:i:s').'.csv');
     }
+
+
+
 
         
 }

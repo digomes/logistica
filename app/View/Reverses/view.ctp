@@ -3,9 +3,9 @@
                 <div class="portlet-title">
                     <?php 
                     //$grupo = $this->Session->read('Auth.User.group_id'); 
-                    if($reverse['Status']['id'] == '10' || $reverse['Status']['id'] == '12'){
+                   // if($reverse['Status']['id'] == '10' || $reverse['Status']['id'] == '12'){}else
                         
-                    }else if($this->Session->read('Auth.User.group_id') == '2'){
+                     if($this->Session->read('Auth.User.group_id') == '2'){
                     ?>
                     <div class="btn-group pull-right">
                         <button class="btn dropdown-toggle" data-toggle="dropdown">Opções <span class="caret"></span></button>
@@ -15,6 +15,13 @@
                                 <li class="divider"></li>
                                 <li><?php echo $this->Html->link(__('Reprovar'), array('action' => 'disapprove', $reverse['Reverse']['id'])); ?></li>
                                 <li><?php echo $this->Html->link(__('Cancelar Reprovação'), array('action' => 'cancel', $reverse['Reverse']['id'])); ?></li>
+                            </ul>
+                    </div>
+                    <?php }else if($this->Session->read('Auth.User.group_id') == '4' AND $reverse['Status']['id'] == '10'){ ?>
+                    <div class="btn-group pull-right">
+                        <button class="btn dropdown-toggle" data-toggle="dropdown">Opções <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li><?php echo $this->Html->link(__('Agendar Coleta'), array('action' => 'inProgress', $reverse['Reverse']['id'])); ?></li>
                             </ul>
                     </div>
                     <?php } ?>
@@ -43,9 +50,14 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Data Criação: <?php echo h($reverse['Reverse']['created']); ?></td>
-                            <td>Última resposta: <?php echo h($reverse['Reverse']['modified']); ?></td>
-                            <td></td>
+                            <td>Data Criação: <?php echo $this->Time->format('d/m/Y H:i:s', $reverse['Reverse']['created']
+); ?></td>
+                            <td>Última resposta: <?php echo $this->Time->format('d/m/Y H:i:s', $reverse['Reverse']['modified']
+); ?></td>
+                            <td><?php if($reverse['Reverse']['inprogress'] == '0000-00-00 00:00:00'){ echo ""; ?><?php }else{ 
+                                echo "Coleta agendada para: ".$this->Time->format('d/m/Y', $reverse['Reverse']['inprogress']
+); } ?>
+                                </td>
                             <td></td>
                         </tr>
                             <?php foreach ($reverse['Upload'] as $upload): ?> 

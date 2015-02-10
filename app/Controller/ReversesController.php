@@ -22,12 +22,6 @@ class ReversesController extends AppController {
             'Paginator'
         );
 
-
-/**
- * index method
- *
- * @return void
- */
         
         public function search(){
             if($this->request->is('post')){
@@ -57,12 +51,18 @@ class ReversesController extends AppController {
                 //$workshops = $this->Reverse->User->Workshop->find('list');
                 $this->set(compact('statuses'));
             }
-        
+            
+/**
+ * index method
+ *
+ * @return void
+ */
         
 	public function index() {
             
                 $this->roleId = $this->Session->read('Auth.User.group_id'); 
-                $this->userId = $this->Session->read('Auth.User.id'); 
+                $this->userId = $this->Session->read('Auth.User.id');
+                $this->carrieruserId = $this->Session->read('Auth.User.carrier_id');  
 		//$this->Reverse->recursive = 0;
 		//$this->set('reverses', $this->Paginator->paginate());
                 $statusColeta = $this->request->data['Reverse']['status_id'];
@@ -81,7 +81,7 @@ class ReversesController extends AppController {
                     $dadosReversa = $this->Reverse->User->findAllByEmailOrUsername(NULL, $userColeta);
                     $userId =  $dadosReversa[0]['User']['id'];
                     
-              if($userId == NULL AND $statusColeta == NULL){
+              if($userId == NULL AND $statusColeta == NULL){       
                   
                 $this->paginate = array(
                     'conditions' => array(
@@ -206,6 +206,29 @@ class ReversesController extends AppController {
                 );
                     $reverses = $this->paginate('Reverse');
                     $this->set(compact('reverses'));
+
+                }else if($this->roleId == '4'){
+
+                $this->Reverse->recursive = 1;   
+                $reverses = $this->Reverse->find('all', array(
+                    'conditions' => array(
+                        //'AND' => array(
+                       // 'AND' => array(
+                               
+                        //    ),
+                      //  'OR' => array(
+                            'Reverse.status_id' => '10', 
+                            'Status.visibility_groups LIKE' => '%"' . $this->roleId . '"%',
+                            'Reverse.carrier_id =' => $this->carrieruserId
+                          //  )
+                       // )
+                       ),
+                    'limit' => '1000'
+                )
+                );
+                   // $reverses = $this->paginate('Reverse');
+                    $this->set(compact('reverses'));
+                    //   Debugger::dump($reverses);
                 }    
 	}
 
@@ -239,12 +262,13 @@ class ReversesController extends AppController {
                             //$this->roleId = $this->Session->read('Auth.User.group_id');
 			try {
                                 $this->request->data['Reverse']['user_id'] = $this->Auth->user('id');
+                                $this->request->data['Reverse']['carrier_id'] = $this->Auth->user('Workshop.carrier_id');
 				//$this->Reverse->createWithAttachments($this->request->data);
                                 $this->Reverse->saveAll($this->request->data);
 				$this->Session->setFlash(__('Nota Fiscal enviada para aprovação do Departamento Fiscal ! Coleta Numero #'.$this->Reverse->getLastInsertID()));
                                 $this->Session->delete('Cart');
                                 $this->Session->delete('Counter');
-                                return $this->redirect(array('controller' => 'Reverses' ,'action' => 'index'));
+                                return $this->redirect(array('controller' => 'Reverses' ,'action' => 'search'));
 			} catch (Exception $e) {
 				$this->Session->setFlash($e->getMessage());
 			}
@@ -513,7 +537,7 @@ class ReversesController extends AppController {
                 if($this->request->data['Reverse']['so']== ''){
                     $this->Session->setFlash(__('Digite o numero da SO para realizar aprovação'));
                 }else{
-                $this->Reverse->read(null, $this->Ticket->id);
+                $this->Reverse->read(null, $this->Reverse->id);
                 $this->Reverse->set('status_id', 10);
                 $this->Reverse->set('so', $this->request->data['Reverse']['so']);
                 $this->Reverse->set('modified', date('Y-m-d H:i:s'));
@@ -524,6 +548,33 @@ class ReversesController extends AppController {
 		}
 		$this->Session->setFlash(__('Não foi possível atender sua solicitação'));
 		$this->redirect(array('action' => 'index'));
+                }
+                }
+    }
+
+    public function inProgress($id = null){
+        $this->Reverse->id = $id;
+                if ($this->request->is('post')) {
+        if (!$this->Reverse->exists()) {
+            throw new NotFoundException(__('Coleta Inválida'));
+        }
+        $this->request->onlyAllow('post');
+                //$data = array('id' => $this->Ticket->id, 'condition_id' => '2');
+                if($this->request->data['Reverse']['dateProgress']== ''){
+                    $this->Session->setFlash(__('Selecione a data da coleta'));
+                }else{
+                $this->Reverse->read(null, $this->Reverse->id);
+                $this->Reverse->set('status_id', 3);
+                $this->Reverse->set('inprogress', $this->request->data['Reverse']['dateProgress']);
+                //$this->Reverse->set('modified', date('Y-m-d H:i:s'));
+        if ($this->Reverse->save()) {
+            $this->Session->setFlash(__('Coleta Agendada'));
+                        //$this->redirect(array('action' => 'index'));
+            $this->redirect(array('action' => 'view', $this->Reverse->id));
+        }
+        $this->Session->setFlash(__('Não foi possível atender sua solicitação'));
+        //$this->redirect(array('action' => 'index'));
+        $this->redirect(array('action' => 'view', $this->Reverse->id));
                 }
                 }
     }
